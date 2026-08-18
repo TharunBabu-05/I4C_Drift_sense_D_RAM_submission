@@ -1,0 +1,279 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" role="img" aria-labelledby="title desc">
+  <title id="title">Drift-Sense: AI-Powered Navigation-Error Recovery</title>
+  <desc id="desc">Animated futuristic workflow for wafer inspection showing drift detection, AI recovery, sub-pixel refinement and accurate navigation.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#050712"/>
+      <stop offset="0.5" stop-color="#09051a"/>
+      <stop offset="1" stop-color="#020713"/>
+    </linearGradient>
+
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#20d9ff"/>
+      <stop offset="0.5" stop-color="#d84cff"/>
+      <stop offset="1" stop-color="#61f6ff"/>
+    </linearGradient>
+
+    <linearGradient id="purpleBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#18dfff"/>
+      <stop offset="0.5" stop-color="#7c35ff"/>
+      <stop offset="1" stop-color="#ff38d1"/>
+    </linearGradient>
+
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00eaff"/>
+      <stop offset="1" stop-color="#6a7dff"/>
+    </linearGradient>
+
+    <filter id="glowPurple">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="glowCyan">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+
+    <pattern id="waferGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#101528"/>
+      <rect x="2" y="2" width="20" height="20" rx="2" fill="#19213a" stroke="#5964a5" stroke-width="0.8"/>
+      <circle cx="12" cy="12" r="2.5" fill="#7985c8"/>
+    </pattern>
+
+    <clipPath id="waferClip">
+      <ellipse cx="210" cy="355" rx="145" ry="72"/>
+    </clipPath>
+
+    <!-- moving light for the title -->
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="620" rx="18" fill="url(#bg)"/>
+  <path d="M30 95 H1570" stroke="#243052" stroke-width="1"/>
+  <path d="M30 590 H1570" stroke="#243052" stroke-width="1"/>
+
+  <!-- ambient glow -->
+  <ellipse cx="790" cy="300" rx="650" ry="210" fill="#6125ff" opacity=".08" filter="url(#softGlow)">
+    <animate attributeName="opacity" values=".04;.12;.04" dur="4s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- HEADER -->
+  <g>
+    <rect x="40" y="20" width="1520" height="65" rx="14" fill="#070b18" stroke="#233a70"/>
+    <text x="800" y="62" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+          font-size="34" font-weight="700" fill="url(#titleGrad)">
+      Drift-Sense: AI-Powered Navigation-Error Recovery
+      <animateTransform attributeName="transform" type="translate"
+                        values="-240 0;0 0;240 0;0 0" keyTimes="0;.25;.5;1"
+                        dur="7s" repeatCount="indefinite"/>
+    </text>
+    <rect x="-250" y="27" width="190" height="4" rx="2" fill="url(#shine)" opacity=".65">
+      <animate attributeName="x" values="-250;1660" dur="3.8s" repeatCount="indefinite"/>
+    </rect>
+    <text x="800" y="82" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+          font-size="13" font-style="italic" fill="#b8c7ff">for Wafer Inspection Tools</text>
+  </g>
+
+  <!-- WAFER / SENSOR -->
+  <g>
+    <ellipse cx="210" cy="365" rx="170" ry="90" fill="#0a1023" stroke="#00dfff" stroke-width="3" opacity=".9"/>
+    <ellipse cx="210" cy="355" rx="145" ry="72" fill="url(#waferGrid)" stroke="#8b52ff" stroke-width="3"/>
+    <ellipse cx="210" cy="355" rx="130" ry="61" fill="none" stroke="#2c4aff" opacity=".65"/>
+    <rect x="180" y="335" width="60" height="40" rx="5" fill="#9c4cff" opacity=".25" stroke="#e14cff" stroke-width="2">
+      <animate attributeName="opacity" values=".15;.8;.15" dur="1.8s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="210" cy="355" r="12" fill="none" stroke="#fff" stroke-width="2" filter="url(#glowCyan)">
+      <animate attributeName="r" values="8;28;8" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.15;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- probe -->
+    <path d="M180 145 H240 L232 275 H188 Z" fill="#0c1220" stroke="#39456b"/>
+    <rect x="194" y="270" width="32" height="45" rx="7" fill="#252d4a" stroke="#8b52ff"/>
+    <path d="M210 315 V340" stroke="#d84cff" stroke-width="7" filter="url(#glowPurple)">
+      <animate attributeName="opacity" values=".2;1;.2" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+
+    <text x="210" y="445" text-anchor="middle" font-family="Arial" font-size="17" font-weight="700" fill="#dce5ff">Wafer Scan</text>
+    <text x="210" y="466" text-anchor="middle" font-family="Arial" font-size="12" fill="#8fa5d9">Drift detected</text>
+  </g>
+
+  <!-- FLOW ARROW 1 -->
+  <g fill="none" stroke="url(#cyan)" stroke-width="5" stroke-linecap="round" filter="url(#glowCyan)">
+    <path d="M385 350 H430"/>
+    <path d="M418 338 L432 350 L418 362"/>
+    <circle cx="385" cy="350" r="4" fill="#fff">
+      <animate attributeName="cx" values="385;430;385" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- REFERENCE TEMPLATE -->
+  <g>
+    <rect x="440" y="190" width="230" height="235" rx="18" fill="#091024" stroke="#16dfff" stroke-width="2"/>
+    <text x="555" y="220" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#e8f6ff">Reference Template</text>
+    <g transform="translate(480 245)">
+      <rect width="150" height="145" rx="8" fill="#111a31" stroke="#5269a9"/>
+      <g fill="#293554" stroke="#6879b0">
+        <rect x="10" y="10" width="38" height="38"/><rect x="56" y="10" width="38" height="38"/><rect x="102" y="10" width="38" height="38"/>
+        <rect x="10" y="54" width="38" height="38"/><rect x="56" y="54" width="38" height="38"/><rect x="102" y="54" width="38" height="38"/>
+        <rect x="10" y="98" width="38" height="38"/><rect x="56" y="98" width="38" height="38"/><rect x="102" y="98" width="38" height="38"/>
+      </g>
+      <rect x="56" y="54" width="38" height="38" fill="#123e59" stroke="#00eaff" stroke-width="3">
+        <animate attributeName="stroke-opacity" values=".3;1;.3" dur="1.5s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="75" cy="73" r="9" fill="none" stroke="#00eaff" stroke-width="2">
+        <animate attributeName="r" values="6;16;6" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- FLOW ARROW 2 -->
+  <g fill="none" stroke="#c54cff" stroke-width="5" stroke-linecap="round" filter="url(#glowPurple)">
+    <path d="M680 350 H725"/>
+    <path d="M713 338 L727 350 L713 362"/>
+    <circle cx="680" cy="350" r="4" fill="#fff">
+      <animate attributeName="cx" values="680;725;680" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- SIAMESE AI -->
+  <g>
+    <rect x="735" y="175" width="290" height="265" rx="18" fill="#0b0a1d" stroke="#d64cff" stroke-width="2"/>
+    <text x="880" y="208" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#f5e8ff">Siamese AI Feature Extractor</text>
+
+    <g stroke="#d64cff" stroke-width="2" fill="none" opacity=".9">
+      <path d="M800 275 L850 250 L900 275 L950 250"/>
+      <path d="M800 355 L850 330 L900 355 L950 330"/>
+      <path d="M850 250 L850 330"/>
+      <path d="M900 275 L900 355"/>
+      <path d="M950 250 L950 330"/>
+    </g>
+    <g fill="#10dfff">
+      <circle cx="800" cy="275" r="7"/><circle cx="850" cy="250" r="7"/><circle cx="900" cy="275" r="7"/><circle cx="950" cy="250" r="7"/>
+      <circle cx="800" cy="355" r="7"/><circle cx="850" cy="330" r="7"/><circle cx="900" cy="355" r="7"/><circle cx="950" cy="330" r="7"/>
+    </g>
+    <g fill="#d64cff">
+      <circle cx="800" cy="275" r="3"/><circle cx="900" cy="275" r="3"/><circle cx="850" cy="330" r="3"/><circle cx="950" cy="330" r="3"/>
+    </g>
+
+    <rect x="770" y="230" width="55" height="35" rx="5" fill="#111b38" stroke="#d64cff"/>
+    <rect x="770" y="315" width="55" height="35" rx="5" fill="#112b38" stroke="#00eaff"/>
+    <text x="797" y="253" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">PATCH A</text>
+    <text x="797" y="338" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">PATCH B</text>
+
+    <rect x="974" y="238" width="13" height="130" rx="6" fill="#17213d" stroke="#667cff"/>
+    <rect x="976" y="320" width="9" height="46" rx="4" fill="#00eaff">
+      <animate attributeName="y" values="238;320;238" dur="2.2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- FLOW ARROW 3 -->
+  <g fill="none" stroke="#ff9b25" stroke-width="5" stroke-linecap="round" filter="url(#glowPurple)">
+    <path d="M1035 350 H1080"/>
+    <path d="M1068 338 L1082 350 L1068 362"/>
+    <circle cx="1035" cy="350" r="4" fill="#fff">
+      <animate attributeName="cx" values="1035;1080;1035" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- CORRELATION -->
+  <g>
+    <rect x="1090" y="175" width="250" height="265" rx="18" fill="#11100b" stroke="#ff9b25" stroke-width="2"/>
+    <text x="1215" y="208" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#fff0d6">Correlation &amp;</text>
+    <text x="1215" y="230" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#fff0d6">Sub-pixel Refinement</text>
+
+    <g stroke="#27345b" stroke-width="1">
+      <path d="M1120 255 H1310 M1120 285 H1310 M1120 315 H1310 M1120 345 H1310 M1120 375 H1310"/>
+      <path d="M1150 245 V390 M1180 245 V390 M1210 245 V390 M1240 245 V390 M1270 245 V390 M1300 245 V390"/>
+    </g>
+    <circle cx="1215" cy="315" r="34" fill="#8b2cff" opacity=".2" filter="url(#softGlow)">
+      <animate attributeName="r" values="20;50;20" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".1;.4;.1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1215" cy="315" r="15" fill="#fff" stroke="#ff9b25" stroke-width="5" filter="url(#glowPurple)">
+      <animate attributeName="r" values="11;17;11" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <path d="M1215 245 V385 M1145 315 H1285" stroke="#ff304f" stroke-width="2" stroke-dasharray="7 6">
+      <animate attributeName="stroke-dashoffset" from="0" to="26" dur="1s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- FLOW ARROW 4 -->
+  <g fill="none" stroke="#7cff7a" stroke-width="5" stroke-linecap="round" filter="url(#glowCyan)">
+    <path d="M1350 350 H1395"/>
+    <path d="M1383 338 L1397 350 L1383 362"/>
+    <circle cx="1350" cy="350" r="4" fill="#fff">
+      <animate attributeName="cx" values="1350;1395;1350" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- PREDICTION -->
+  <g>
+    <rect x="1410" y="175" width="155" height="265" rx="18" fill="#071b17" stroke="#4cff9a" stroke-width="2"/>
+    <text x="1487" y="207" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#dcfff0">Predicted</text>
+    <text x="1487" y="228" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#dcfff0">Location</text>
+    <rect x="1430" y="250" width="115" height="125" rx="7" fill="url(#waferGrid)" stroke="#42f6a0"/>
+    <rect x="1470" y="290" width="35" height="35" fill="none" stroke="#49ff9c" stroke-width="3">
+      <animate attributeName="stroke-opacity" values=".3;1;.3" dur="1.4s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="1487" cy="307" r="9" fill="#ff43d8" stroke="#fff" stroke-width="2" filter="url(#glowPurple)">
+      <animate attributeName="r" values="6;13;6" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <path d="M1487 280 V335 M1460 307 H1514" stroke="#49ff9c" stroke-width="2"/>
+    <text x="1487" y="405" text-anchor="middle" font-family="Arial" font-size="12" fill="#83e9bc">Sub-pixel accurate</text>
+  </g>
+
+  <!-- FEEDBACK LOOP -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M1490 450 V510 H210 V450" stroke="#7d43ff" stroke-width="3" stroke-dasharray="7 8">
+      <animate attributeName="stroke-dashoffset" from="0" to="-30" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M210 450 L198 470 L222 470 Z" fill="#d64cff" stroke="none">
+      <animateTransform attributeName="transform" type="translate" values="0 0;0 -6;0 0" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- STATUS BAR -->
+  <g>
+    <rect x="440" y="475" width="900" height="65" rx="30" fill="#090d20" stroke="url(#purpleBlue)" stroke-width="2"/>
+    <circle cx="480" cy="507" r="11" fill="none" stroke="#ff45d8" stroke-width="3">
+      <animate attributeName="r" values="8;15;8" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <text x="510" y="514" font-family="Arial" font-size="17" font-weight="700" fill="#fff">DRIFT DETECTED</text>
+    <text x="700" y="514" font-family="Arial" font-size="22" fill="#00eaff">→</text>
+    <text x="735" y="514" font-family="Arial" font-size="17" font-weight="700" fill="#fff">AI RECOVERY</text>
+    <text x="925" y="514" font-family="Arial" font-size="22" fill="#d64cff">→</text>
+    <text x="960" y="514" font-family="Arial" font-size="17" font-weight="700" fill="#fff">ACCURATE NAVIGATION</text>
+
+    <circle cx="475" cy="507" r="4" fill="#fff">
+      <animate attributeName="cx" values="475;1290;475" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.2;1" dur="5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- FOOTER FEATURES -->
+  <g font-family="Arial">
+    <rect x="40" y="555" width="360" height="45" rx="12" fill="#120b27" stroke="#d64cff"/>
+    <text x="220" y="584" text-anchor="middle" font-size="15" font-weight="700" fill="#f2d8ff">SUB-PIXEL ACCURACY</text>
+
+    <rect x="420" y="555" width="360" height="45" rx="12" fill="#061a24" stroke="#00dfff"/>
+    <text x="600" y="584" text-anchor="middle" font-size="15" font-weight="700" fill="#c9faff">DEEP METRIC LEARNING</text>
+
+    <rect x="800" y="555" width="360" height="45" rx="12" fill="#211307" stroke="#ff9b25"/>
+    <text x="980" y="584" text-anchor="middle" font-size="15" font-weight="700" fill="#ffe4c0">ERROR RECOVERY</text>
+
+    <rect x="1180" y="555" width="380" height="45" rx="12" fill="#061d15" stroke="#4cff9a"/>
+    <text x="1370" y="584" text-anchor="middle" font-size="15" font-weight="700" fill="#d7ffea">RELIABLE INSPECTION</text>
+  </g>
+</svg>
