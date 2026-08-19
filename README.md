@@ -152,7 +152,7 @@ pip install -r requirements.txt --extra-index-url https://download.pytorch.org/w
 
 ### 2. Single Pair Inference
 ```bash
-python3 master_inference_claude.py --reference all_60_pairs/pair_001/reference.png  --search all_60_pairs/pair_001/search.png 
+python3 master_inference.py --reference all_60_pairs/pair_001/reference.png  --search all_60_pairs/pair_001/search.png 
 ```
 
 ### 3. Benchmark Evaluation
@@ -276,7 +276,7 @@ If you want to run the pipeline on a single pair of images, use the Master Infer
 
 By default, the script will execute the complete **Hybrid (OpenCV NCC + Siamese AI)** pipeline:
 ```bash
-python master_inference_claude.py --reference img2.png --search img1.png
+python master_inference.py --reference img2.png --search img1.png
 ```
 
 ### Additional Inference Options:
