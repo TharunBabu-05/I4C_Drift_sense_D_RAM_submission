@@ -190,13 +190,7 @@ Full per-pair results are written to `results_manifest.csv`, with visualizations
 
 ## ⚔️ Baseline Comparison: Classical OpenCV vs. Our Hybrid TLM
 
-### Extreme-Noise Benchmark (Synthetic Test Set, 1,600 images, 2.0× noise)
-We injected catastrophic physical degradations (Poisson/Gaussian noise, focal blur) to simulate extreme factory conditions.
 
-| Metric | Baseline (`inference.py`, OpenCV) | Our Hybrid TLM (`_resnet_final_16k_correct_Dataset_TLM`) |
-|---|---|---|
-| Localization Accuracy (≤5px) | 52.6% (842 hits) | **58.0%** (928 hits) |
-| Inference Speed (Pure CPU) | 65.0 ms/image | **33.2 ms/image** |
 
 ### Ideal-Conditions Benchmark (Physical Test Set, 60 images)
 
