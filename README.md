@@ -282,9 +282,9 @@ python master_inference.py --reference img2.png --search img1.png
 ### Additional Inference Options:
 * **Run Pure Classical Baseline:** If you want to force the pipeline to bypass the AI and execute only the classic 3-Layer OpenCV Pyramid (for ablation testing), add the `--ncc_only` flag:
   ```bash
-  python master_inference_claude.py --reference img2.png --search img1.png --ncc_only
+  python master_inference.py --reference img2.png --search img1.png --ncc_only
   ```
 * **Enable Verbose Output:** Add `--verbose` to see the step-by-step execution times and fusion scores:
   ```bash
-  python master_inference_claude.py --reference img2.png --search img1.png --verbose
+  python master_inference.py --reference img2.png --search img1.png --verbose
   ```
