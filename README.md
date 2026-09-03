@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/drift_sense_animated.svg" width="100%">
+<img src="phase1_submission/assets/drift_sense_animated.svg" width="100%">
 
 </div>
 
@@ -108,64 +108,87 @@ Developed for the **Applied Materials Phase 2 Benchmark Challenge**, Drift-Sense
 
 ---
 
-## 🏗️ System Architecture & Mathematical Formulation
+## 🏗️ System Architecture & Extended Multi-Stage Pipeline
+
+Drift-Sense Phase 2 is an **extended multi-level pyramidal architecture** built directly upon the proven Phase 1 foundation, upgraded with multi-scale angular search grids, 128-D deep metric learning re-ranking, continuous sub-pixel parabolic surfaces, and noise-adaptive decision gating.
 
 ```
-                               ┌─────────────────────────┐
-                               │ Reference & Search SEM  │
-                               └────────────┬────────────┘
-                                            │
-                                            ▼
-                           ┌─────────────────────────────────┐
-                           │   Stage 1: Multi-Scale Search   │
-                           │  z in [8,12], θ in [-5°, +5°]   │
-                           │   FFT-Accelerated 2D ZNCC       │
-                           └────────────────┬────────────────┘
-                                            │ Top-K Candidate Peaks
-                                            ▼
-                           ┌─────────────────────────────────┐
-                           │   Stage 2: Deep Metric Fusion   │
-                           │  ResNet Siamese 128-D Embedding │
-                           │  Fused Score = α·NCC + (1-α)·S  │
-                           └────────────────┬────────────────┘
-                                            │
-                                            ▼
-                           ┌─────────────────────────────────┐
-                           │   Stage 3: Sub-Pixel Refinement │
-                           │  2D Taylor Series Parabola Fit  │
-                           │   Δx, Δy in [-0.5, +0.5] px     │
-                           └────────────────┬────────────────┘
-                                            │
-                                            ▼
-                           ┌─────────────────────────────────┐
-                           │   Stage 4: Continuous Scale Fit │
-                           │ 1D 3-Point Parabolic Scale Peak │
-                           └────────────────┬────────────────┘
-                                            │
-                                            ▼
-                           ┌─────────────────────────────────┐
-                           │  Stage 5: Noise-Adaptive Gate   │
-                           │  Laplacian Variance Gating      │
-                           │  Decision: Present / Absent     │
-                           └─────────────────────────────────┘
+                      1000x1000 SEM Search Image & Reference Image
+                                          │
+                                          ▼
+             ┌─────────────────────────────────────────────────────────┐
+             │                      PREPROCESSING                      │
+             │  Grayscale Conversion · Local Contrast Normalization   │
+             │     Laplacian Noise Variance · Sobel Edge Enhancement   │
+             └────────────────────────────┬────────────────────────────┘
+                                          │
+                                          ▼
+             ┌─────────────────────────────────────────────────────────┐
+             │       LEVEL 0: COARSE MULTI-SCALE ANGULAR SEARCH        │
+             │    50x50 Downsampled Template · Multi-Scale z ∈ [8, 12] │
+             │   Rotation θ ∈ [-5°, +5°] · FFT-Accelerated 2D ZNCC     │
+             └────────────────────────────┬────────────────────────────┘
+                                          │
+                                          ▼ Top-K Candidate Peaks (NMS)
+             ┌─────────────────────────────────────────────────────────┐
+             │   LEVEL 1: SIAMESE VERIFICATION & METRIC RE-RANKING     │
+             │      100x100 Candidate Crops · ResNet 128-D Embedding   │
+             │       Cosine Metric: S_Siamese = u·v / (||u||·||v||)    │
+             │         Score Fusion: Fused = 0.3·NCC + 0.7·Siamese     │
+             │           Center Bias Disambiguation Penalty            │
+             └────────────────────────────┬────────────────────────────┘
+                                          │
+                                          ▼ Re-Ranked Best Candidate Peak
+             ┌─────────────────────────────────────────────────────────┐
+             │    LEVEL 2: FINE LOCALIZATION & SUB-PIXEL REFINEMENT    │
+             │       200x200 Local Neighborhood Dense Rescan           │
+             │     2D Continuous Taylor Parabolic Sub-Pixel Surface    │
+             │      1D Continuous 3-Point Parabolic Scale Peak Fit     │
+             └────────────────────────────┬────────────────────────────┘
+                                          │
+                                          ▼
+             ┌─────────────────────────────────────────────────────────┐
+             │           POST-PROCESSING & DECISION GATING             │
+             │      Dual Rejection Gate: ZNCC + Siamese + PSR          │
+             │   Noise-Adaptive Laplacian Gate: Dynamic NCC Threshold  │
+             │       Boundary Constraint Check · Sigmoid Confidence    │
+             └────────────────────────────┬────────────────────────────┘
+                                          │
+                                          ▼
+             ┌─────────────────────────────────────────────────────────┐
+             │                      FINAL OUTPUT                       │
+             │     Sub-Pixel (x, y) · Scale z · Rotation θ (deg)       │
+             │      Target Present Flag (0/1) · Confidence Score       │
+             └─────────────────────────────────────────────────────────┘
 ```
 
-### 1. Normalized Cross-Correlation (ZNCC)
+---
+
+### 🧮 Mathematical Foundations & Algorithmic Modules
+
+#### 1. Level 0: Normalized Cross-Correlation (ZNCC)
 $$\gamma(u, v) = \frac{\sum_{x, y} [I(x, y) - \bar{I}_{u, v}] [T(x - u, y - v) - \bar{T}]}{\sqrt{\sum_{x, y} [I(x, y) - \bar{I}_{u, v}]^2 \sum_{x, y} [T(x - u, y - v) - \bar{T}]^2}}$$
 
-### 2. Deep Siamese Embedding & Metric Fusion
-$$S_{\text{Siamese}} = \frac{f_\theta(T) \cdot f_\theta(I_{\text{crop}})}{\|f_\theta(T)\|_2 \|f_\theta(I_{\text{crop}})\|_2}, \quad S_{\text{Fused}} = \alpha \cdot \gamma_{\text{norm}} + (1 - \alpha) \cdot S_{\text{Siamese}} - \lambda_{\text{center}} \frac{d_{\text{center}}}{d_{\text{max}}}$$
+#### 2. Level 1: Deep Siamese Embedding & Metric Fusion (70% Neural Weight)
+$$S_{\text{Siamese}} = \frac{f_\theta(T) \cdot f_\theta(I_{\text{crop}})}{\|f_\theta(T)\|_2 \|f_\theta(I_{\text{crop}})\|_2}$$
 
-### 3. Continuous 2D Taylor Sub-Pixel Parabolic Refinement
-Around the discrete correlation peak $(x_0, y_0)$:
-$$f(x, y) \approx f(x_0, y_0) + \mathbf{g}^T \Delta \mathbf{p} + \frac{1}{2} \Delta \mathbf{p}^T \mathbf{H} \Delta \mathbf{p} \implies \Delta \mathbf{p}^* = -\mathbf{H}^{-1} \mathbf{g}$$
-where $\mathbf{g} = \left[\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right]^T$ and $\mathbf{H}$ is the $2 \times 2$ Hessian matrix.
+$$\text{Score}_{\text{Fused}} = \alpha \cdot \gamma_{\text{norm}} + (1 - \alpha) \cdot S_{\text{Siamese}} - \lambda_{\text{center}} \frac{d_{\text{center}}}{d_{\text{max}}}$$
+where $\alpha = 0.30$, $\lambda_{\text{center}} = 0.05$, and $d_{\text{center}} = \sqrt{(x - 500)^2 + (y - 500)^2}$.
 
-### 4. Continuous 1D Scale Parabolic Interpolation
+#### 3. Level 2: Continuous 2D Taylor Sub-Pixel Parabolic Refinement
+Around the discrete correlation peak $(x_0, y_0)$, the continuous correlation surface is modeled via a 2nd-order Taylor series:
+$$f(\mathbf{p}) \approx f(\mathbf{p}_0) + \mathbf{g}^T \Delta \mathbf{p} + \frac{1}{2} \Delta \mathbf{p}^T \mathbf{H} \Delta \mathbf{p} \implies \Delta \mathbf{p}^* = -\mathbf{H}^{-1} \mathbf{g}$$
+where $\mathbf{g} = \left[\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right]^T$, $\mathbf{H} = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\ \frac{\partial^2 f}{\partial x \partial y} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}$, constrained to $\Delta \mathbf{p}^* \in [-0.5, +0.5]\text{ px}$.
+
+#### 4. Level 2: Continuous 1D Scale Parabolic Interpolation
+Across the discrete scale triplets $[z_0 - \Delta z, z_0, z_0 + \Delta z]$:
 $$z^* = z_0 + \frac{\Delta z}{2} \cdot \frac{\gamma(z_0 - \Delta z) - \gamma(z_0 + \Delta z)}{\gamma(z_0 - \Delta z) - 2\gamma(z_0) + \gamma(z_0 + \Delta z)}$$
 
-### 5. Noise-Adaptive Laplacian Gate
-$$\tau_{\text{NCC}} = \begin{cases} 0.68 & \text{if } \sigma_{\text{Laplacian}}^2 > 2200.0 \text{ (Degraded SEM)} \\ 0.78 & \text{if } \sigma_{\text{Laplacian}}^2 \le 2200.0 \text{ (Nominal SEM / Decoys)} \end{cases}$$
+#### 5. Post-Processing: Noise-Adaptive Laplacian Gate & Decoy Rejection
+To eliminate false decoy alarms while preserving noise-degraded true instances:
+$$\tau_{\text{NCC}} = \begin{cases} 0.68 & \text{if } \sigma_{\text{Laplacian}}^2 > 2200.0 \text{ (Degraded SEM / Poisson Noise)} \\ 0.78 & \text{if } \sigma_{\text{Laplacian}}^2 \le 2200.0 \text{ (Nominal Clean SEM / Decoys)} \end{cases}$$
+
+$$\text{PSR} = \frac{\gamma_{\text{max}} - \mu_{\text{sidelobe}}}{\sigma_{\text{sidelobe}}} \ge 1.8$$
 
 ---
 
