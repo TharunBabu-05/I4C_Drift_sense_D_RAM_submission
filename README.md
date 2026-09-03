@@ -1,11 +1,8 @@
-# 🔬 DRIFT-SENSE: Pyramidal Deep Metric Learning for Semiconductor Sub-Pixel SEM Metrology
+<div align="center">
 
-[![Competition Score](https://img.shields.io/badge/Competition%20Score-85.83%20%2F%20100.0-brightgreen.svg?style=for-the-badge&logo=target)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
-[![Precision](https://img.shields.io/badge/Precision-97.47%25-blue.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
-[![Recall](https://img.shields.io/badge/Recall-96.25%25-green.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
-[![Sub-Pixel Accuracy](https://img.shields.io/badge/Sub--Pixel%20Accuracy-0.90%20px-orange.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
-[![Inference Speed](https://img.shields.io/badge/Median%20Speed-885%20ms-purple.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
-[![License](https://img.shields.io/badge/License-MIT-grey.svg?style=for-the-badge)](LICENSE)
+<img src="assets/drift_sense_animated.svg" width="100%">
+
+</div>
 
 ---
 
