@@ -1,0 +1,9 @@
+dataset,strategy,loc_score,scale_score,rotation_score,rejection_score,confidence_score,efficiency_score,total_score,set_a_5px,set_b_5px,median_rt_ms,p90_rt_ms,p95_rt_ms,max_rt_ms
+DS2_60Gen,A_Baseline_NCC_First,16.73,4.66,6.16,13.56,9.82,5.0,55.91,64.3,34.3,360.7,409.8,432.6,478.6
+DS2_60Gen,B_HighRes_Local_Refinement,17.11,4.81,6.47,13.56,9.75,5.0,56.7,65.7,34.3,401.7,484.0,496.4,538.5
+DS2_60Gen,C_HighRes_Edge_Blended,16.15,4.56,6.12,13.56,9.71,5.0,55.11,62.9,30.0,407.3,484.1,498.0,521.8
+DS2_60Gen,D_HighRes_Edge_Siamese_Verifier,16.15,4.56,6.12,13.56,9.83,5.0,55.23,62.9,30.0,401.8,485.2,500.5,530.3
+DS1_Generic,A_Baseline_NCC_First,21.54,7.01,9.09,13.67,9.06,5.0,65.38,97.1,20.0,350.1,399.9,408.3,451.2
+DS1_Generic,B_HighRes_Local_Refinement,22.08,6.99,8.99,13.58,9.04,5.0,65.68,98.6,21.4,406.7,470.6,486.0,557.9
+DS1_Generic,C_HighRes_Edge_Blended,21.63,7.24,9.07,13.55,8.78,5.0,65.28,97.1,20.0,406.8,480.8,488.9,532.1
+DS1_Generic,D_HighRes_Edge_Siamese_Verifier,21.63,7.09,9.05,13.62,9.01,5.0,65.41,97.1,20.0,402.0,472.0,486.8,543.5

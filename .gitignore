@@ -1,0 +1,19 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Scratch & temporary logs
+scratch/
+log_*.txt
+*.zip
+
+# OS artifacts
+.DS_Store
+Thumbs.db

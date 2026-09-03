@@ -1,0 +1,5 @@
+configuration,pct_5px,mean_loc_err_px,mean_scale_err,median_runtime_ms
+1. Fixed 10x,24.0,232.86,0.9047,1042.2
+2. 8-12 Coarse (step 1.0),24.0,232.86,0.8401,561.8
+3. 8-12 Finer (step 0.5),30.0,253.52,0.8588,511.7
+4. Best Coarse + Refinement (step 0.25),28.0,254.83,0.8507,944.2

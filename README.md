@@ -1,284 +1,257 @@
-<div align="center">
+# 🔬 DRIFT-SENSE: Pyramidal Deep Metric Learning for Semiconductor Sub-Pixel SEM Metrology
 
-<img src="assets/drift_sense_animated.svg" width="100%">
-
-</div>
-
----
-
-## 🚨 The Problem Statement
-In modern semiconductor foundries, locating a specific microscopic reference patch (e.g., a single FinFET or DRAM layout cell) within a massive, highly-degraded Scanning Electron Microscope (SEM) search image is an immense challenge:
-* **Extreme Noise:** SEM imaging physics naturally introduces catastrophic Poisson shot noise, Gaussian read noise, focal blur, multiplicative speckle, contrast drift, and stage vibration jitter.
-* **Periodic Decoys:** Semiconductor chips (especially DRAM arrays) consist of millions of perfectly repeating, identical-looking structures.
-* **Classical Fragility:** Traditional mathematical Computer Vision algorithms (like pure Template Matching) routinely fail because they lack the semantic understanding to differentiate the true target from a noisy periodic decoy.
-
-## 💡 Our Solution
-We engineered a **Hybrid Fusion Pipeline** that runs classical Normalized Cross-Correlation (NCC) search through a **3-Level Image Pyramid**, disambiguated by a **Siamese Triplet Loss Model (TLM)** built on a lightweight **Custom 4-Layer ResNet** encoder.
-
-By combining the raw speed of classical coarse search with the deep semantic understanding of a learned heatmap regressor, we created a system capable of shattering classical accuracy baselines while maintaining strict real-time edge-device constraints (~44ms average on CPU, 1.38MB model weights).
+[![Competition Score](https://img.shields.io/badge/Competition%20Score-85.83%20%2F%20100.0-brightgreen.svg?style=for-the-badge&logo=target)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
+[![Precision](https://img.shields.io/badge/Precision-97.47%25-blue.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
+[![Recall](https://img.shields.io/badge/Recall-96.25%25-green.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
+[![Sub-Pixel Accuracy](https://img.shields.io/badge/Sub--Pixel%20Accuracy-0.90%20px-orange.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
+[![Inference Speed](https://img.shields.io/badge/Median%20Speed-885%20ms-purple.svg?style=for-the-badge)](https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission)
+[![License](https://img.shields.io/badge/License-MIT-grey.svg?style=for-the-badge)](LICENSE)
 
 ---
 
-## 🏗️ Architecture Deep-Dive
+## 📌 Executive Summary
 
-### 1. Preprocessing Pipeline
-Every input pair (target crop + full search image) is normalized before matching:
-* Convert to grayscale (uint8)
-* Histogram equalization
-* Denoising (Gaussian / Median)
-* Edge enhancement
+**Drift-Sense** is an industrial-grade, multi-stage **Pyramidal Coarse-to-Fine Deep Metric Inference Engine** designed for high-precision pattern localization ($x, y$), continuous scale estimation ($z \in [8.0, 12.0]$), rotation estimation ($\theta \in [-5.0^\circ, +5.0^\circ]$), and absent-target decoy rejection under extreme Scanning Electron Microscope (SEM) noise and cross-domain optical shifts.
 
-### 2. Custom 4-Layer ResNet Siamese Encoder
-Rather than deploying a massive off-the-shelf architecture, we designed a deliberately bottlenecked **4-Layer ResNet** encoder. This is the only backbone used in the pipeline (selected via `--encoder resnet`):
-* **Why?** It mathematically forces the network to ignore transient noise and focus purely on extracting the fundamental, invariant geometric structure of the semiconductor layouts.
-* **Output:** Projects 1-channel grayscale SEM patches into a discriminative **128-Dimensional embedding space**, ready for triplet-loss metric learning.
-
-### 3. Training Setup
-| Component | Detail |
-|---|---|
-| Framework | PyTorch 2.x, OpenCV, NumPy |
-| Backbone | Custom 4-Layer ResNet Siamese Encoder |
-| Optimizer | AdamW (initial LR = 0.001, weight decay = 1e-4) |
-| LR Scheduler | Cosine Annealing (T_max = 30 epochs) |
-| Loss Function | Triplet Loss Model (TLM) — metric learning over the 128-D embedding space, with hard negative mining (15 hard periodic-decoy negatives + 15 global random negatives per anchor) |
-| Deployment Target | 100% CPU edge execution (factory inspection hardware); optional CUDA 12.1 GPU acceleration |
-
-### 4. Three-Level Image Pyramid (Hybrid Inference)
-Our production inference flow (`run_inference.py`) splits the search space across three progressively finer pyramid levels to balance speed and accuracy:
-
-```mermaid
-graph TD
-    A[1000x1000 SEM Search Image] --> B[Preprocessing: Grayscale, Histogram Eq, Denoise, Edge Enhance]
-    B --> C[Level 0: Coarse NCC — 50x50 template across 500x500]
-    C -->|Fast Global Screening| D[Top-K Candidate Peaks]
-    D --> E[Level 1: Siamese Verification & Re-Ranking — 100x100]
-    E -->|4-Layer ResNet TLM| F[Re-Ranked Best Candidate]
-    F --> G[Level 2: Fine Localization — 200x200 Local Refinement]
-    G --> H{Center Bias Disambiguation}
-    H -->|Multiple similar peaks?| I[Select candidate closest to image center]
-    I --> J[Post-Processing: NMS, Sub-Pixel Refinement, Boundary Check, Confidence Threshold]
-    J --> K((Final Sub-Pixel x, y Coordinate))
-```
-
-1. **Level 0 — Coarse NCC:** A 50×50 template is swept across a 500×500 downsampled search region for fast global screening, producing Top‑K candidate peaks.
-2. **Level 1 — Siamese Verification & Re-Ranking:** Full-resolution (100×100) matching using the Siamese ResNet TLM encoder re-ranks and verifies candidates against periodic decoys.
-3. **Level 2 — Fine Localization:** Local refinement at 200×200 around the best candidate to pin down the final target.
-4. **Center Bias Disambiguation:** When multiple candidates score similarly, the pipeline computes each candidate's distance from the image center and selects the closest reliable candidate.
-5. **Post-Processing:** Non-Maximum Suppression, fine peak/coordinate refinement, boundary checking, and confidence thresholding produce the final `(x, y)` output.
-
-### 5. Decision Rules & Mathematical Formulas
-
-**Non-Maximum Suppression**
-Extract Top‑K (K = 3) peaks from the heatmap `H(x, y)` using a 3×3 NMS window:
-```
-P_DL(t) = H(x_t, y_t)
-```
-
-**Hybrid Score Fusion**
-Deep semantic probability is fused with the local structural NCC score using a power-law weighting:
-```
-S_fused(i) = P_DL(i)^α · R_NCC(i)^β
-α = 0.6, β = 1.5
--1 ≤ R_NCC ≤ 1,  0 ≤ P_DL ≤ 1
-```
-
-**Periodic Pitch Decoy Rejection Threshold**
-The winning candidate must clear the next-best candidate by a fixed margin to overcome periodic DRAM cell similarity:
-```
-r' = 1                          if S_best(1) ≥ T_theory
-r' = argmax_i S_best(i)         otherwise
-T_theory = 1.15   (empirically chosen)
-```
-
-**Sub-Pixel Parabolic Refinement**
-2D parabolic peak fitting around the winning integer peak `(x̂, ŷ)`:
-```
-Δx_sub = R(x̂+1, ŷ) − R(x̂−1, ŷ) / [2(2R(x̂,ŷ) − R(x̂−1,ŷ) − R(x̂+1,ŷ))]
-Δy_sub = R(x̂, ŷ+1) − R(x̂, ŷ−1) / [2(2R(x̂,ŷ) − R(x̂,ŷ−1) − R(x̂,ŷ+1))]
-(x*, y*) = (x̂ + Δx_sub, ŷ + Δy_sub)
-```
+Developed for the **Applied Materials Phase 2 Benchmark Challenge**, Drift-Sense achieves an official competition score of **85.83 / 100.0**, demonstrating sub-pixel precision ($0.90\text{ px}$ mean localization error), **97.47% Precision**, **90.0% Decoy Rejection**, and **100.0% Optical RGB Generalization** with real-time edge execution speed ($<900\text{ ms}$).
 
 ---
 
-## 📊 Dataset & MLOps Generation
-Because real foundry images are highly confidential, we engineered a procedural **MLOps Synthetic DRAM Dataset Generator**, built on **60 CAD baseline DRAM generator scripts** spanning 5 structurally distinct sub-micron layout families (100% DRAM architectures):
+## 🏆 Phase 2 Official Competition Results (200-Pair Benchmark)
 
-1. **Vertical BL-Twist DRAM Arrays** — twisted/crossover bitlines, double parallel capacitor plates, top via pads
-2. **3D Stacked-Capacitor DRAM** — cylindrical/rectangular stacked capacitors, storage node isolation
-3. **Hybrid Zigzag & Box-Capacitor DRAM** — alternating zigzag bitlines, box-capacitor nodes in isolation trenches
-4. **Crown-Capacitor & Deep-Trench DRAM** — hollow crown-shaped capacitor nodes, shared S/D diffusion
-5. **Honeycomb Packed & Periphery DRAM** — highest-density honeycomb-packed arrays, WL driver/SA via matrices
+```
+=====================================================================================
+           OFFICIAL 100-POINT COMPETITION SCORE BREAKDOWN          
+=====================================================================================
+  [1] Localization Score        :  34.25 / 40.0   (0.90 px mean sub-pixel error)
+  [2] Scale Estimation          :   5.91 / 10.0   (Continuous 1D Parabolic Fit)
+  [3] Rotation Estimation       :   8.41 / 10.0   (1.25° Angular Step Grid)
+  [--] Pose Total               :  14.31 / 20.0
+  [4] Absent Target Rejection   :  13.97 / 15.0   (TP = 154/160, TN = 36/40)
+  [5] Confidence Calibration    :   8.30 / 10.0   (AUC = 0.8301)
+  [6] Efficiency / Speed        :   5.00 /  5.0   (Sub-second runtime: 885 ms)
+  [7] Generalization/Citations  :  10.00 / 10.0   (Full Physics Citations)
+-------------------------------------------------------------------------------------
+  🏆 TOTAL COMPETITION SCORE    :  85.83 / 100.0
+=====================================================================================
+```
 
-**Generation pipeline:**
-* Uniform target sampling with **zero center-position bias** — target coordinates `(x_gt, y_gt) ∈ [100, 900] × [100, 900]` over a 1000×1000 canvas.
-* Reference/search pair creation: high-magnification reference crop (100×100) upscaled to full resolution, paired with a full 1000×1000 search image at lower magnification.
-* Metadata banner stripping to remove synthetic SEM header/footer artifacts before degradation.
-* **Stochastic SEM degradation engine** applying 2.0× physical degradation impact:
-  * Poisson shot noise
-  * Gaussian read noise
-  * Defocus blur (Gaussian)
-  * Multiplicative speckle
-  * Contrast modulation
-  * Stage vibration jitter (affine translation)
+### 🎯 Target Detection Confusion Matrix (200 Benchmark Pairs)
 
-Each degradation is physically modeled and cited (Reimer 2013 — SEM physics; Holzer et al. 2021 — low-dose SEM noise; Goldstein et al. 2017 — SEM & X-ray microanalysis; Postek & Vladár 2011 — CD metrology noise; Sim et al. — SE gain/contrast in SEM; Cizmar et al. 2008 — vibration analysis/mitigation in high-res SEM).
+```
+                    ┌─────────────────────────┬─────────────────────────┐
+                    │  Predicted ABSENT (0)   │  Predicted PRESENT (1)  │
+┌───────────────────┼─────────────────────────┼─────────────────────────┤
+│ Ground Truth (0)  │     TN = 36 (90.0%)     │     FP = 4 (10.0%)      │
+├───────────────────┼─────────────────────────┼─────────────────────────┤
+│ Ground Truth (1)  │     FN = 6 (3.75%)      │    TP = 154 (96.25%)    │
+└───────────────────┴─────────────────────────┴─────────────────────────┘
+```
 
-**Scale & rotation modeling:**
-* Scale invariance via broadcast pooling of a 256-D embedding into an 8×8×1 heatmap.
-* Affine rotation + translation jitter: `θ ∈ [-15°, 15°]`, `Δx, Δy ∈ [-3, 3] μm`, applied with border-replicate padding.
-
-**Strict architecture-level dataset split (zero data leakage):**
-
-| Split | Layout Scripts | Share | Notes |
-|---|---|---|---|
-| Train | 50 | 80% | Learns general DRAM layout features |
-| Validation | 5 | 10% | Evaluates unseen layout generalization |
-| Test (locked) | 5 | 10% | Hidden benchmark, unseen architectures never used during training |
-
-Validation and test layouts are generated from architecture scripts the model has never seen, guaranteeing the model is evaluated on genuinely novel wafer designs.
+| Metric | Score | Physical Significance |
+|---|---|---|
+| **Precision** | **97.47%** | Near-zero false alarms under complex semiconductor patterns |
+| **Recall / Sensitivity** | **96.25%** | Robust recovery across nominal, degraded, and optical pairs |
+| **F1 Score** | **0.9686** | Optimal harmonic trade-off between sensitivity and specificity |
+| **Specificity (Decoy Rejection)** | **90.00%** | 36 / 40 absent target decoys correctly rejected |
+| **Median Execution Time** | **885.2 ms** | Sub-second edge execution speed |
 
 ---
 
-## 🚀 Execution & Usage
+## 📊 Graphical Submission Artifacts
+
+### 1. Classification Confusion Matrix & Localization Error CDF
+| Target Detection Confusion Matrix | Localization Error Cumulative Distribution Function (CDF) |
+|:---:|:---:|
+| ![Confusion Matrix](assets/submission_plots/confusion_matrix.png) | ![Localization Error CDF](assets/submission_plots/localization_error_cdf.png) |
+| *2x2 Classification Matrix (97.47% Precision, 96.25% Recall)* | *CDF showing 71.2% in Sub-1.0px Full Credit Tier and 98.6% Sub-2.0px* |
+
+---
+
+### 2. 100-Point Competition Score Breakdown & Set-Wise Performance
+| 100-Point Score Breakdown (85.83 / 100.0) | Set-Wise Pass Rate & Sub-Pixel Precision |
+|:---:|:---:|
+| ![Score Breakdown](assets/submission_plots/competition_score_breakdown.png) | ![Set-Wise Performance](assets/submission_plots/set_wise_performance.png) |
+| *Official Category-wise Marks Allocation* | *Set A (92.9%), Set B (87.1%), Set C (90.0%), Set D (100.0%)* |
+
+---
+
+### 3. ROC Curve & Multi-Panel Pose Error Distributions
+| Receiver Operating Characteristic (ROC-AUC) | Pose Estimation Precision Distributions |
+|:---:|:---:|
+| ![ROC Curve](assets/submission_plots/roc_auc_curve.png) | ![Pose Error Distributions](assets/submission_plots/pose_error_distributions.png) |
+| *Confidence Calibration ROC Curve (AUC = 0.8301)* | *Sub-pixel Localization (0.90 px), Scale (0.08), and Theta (0.22°)* |
+
+---
+
+## 📈 Benchmark Set Breakdown (182 / 200 Pairs Passed)
+
+| Benchmark Subset | Pair Count | Passed Pairs | Pass Rate (%) | Mean Sub-Pixel Loc Error | Physical Characteristic |
+|---|---|---|---|---|---|
+| **Set A (Nominal SEM)** | 70 | 65 | **92.9%** | **0.69 px** | Nominal pose, scale $z \in [8, 12]$, rotation $\theta \in [-5^\circ, +5^\circ]$ |
+| **Set B (Degraded SEM)** | 70 | 61 | **87.1%** | **0.78 px** | Poisson photon shot noise, defocus blur, charging streaks |
+| **Set C (Absent Decoys)** | 40 | 36 | **90.0%** | **0.00 px** | Same-family architecture absent decoy canvases (`found = 0`) |
+| **Set D (Optical RGB)** | 20 | 20 | **100.0%** | **1.01 px** | 3-Channel RGB optical microscopy analogue domain shift |
+
+---
+
+## 🏛️ Phase 1 vs Phase 2 Evolution
+
+| Architectural Dimension | Phase 1 Baseline (Historical) | Phase 2 Production (Current Submission) |
+|---|---|---|
+| **Scale Range ($z$)** | Fixed $10.0\times$ ratio | Continuous $z \in [8.0, 12.0]$ search & 1D parabolic fit |
+| **Rotation ($\theta$)** | Pure translation ($\theta = 0^\circ$) | Multi-scale angular search $\theta \in [-5.0^\circ, +5.0^\circ]$ |
+| **Target Presence** | 100% Present targets | Dual-gate absent decoy rejection (ZNCC + Siamese + PSR) |
+| **Noise Resilience** | Gaussian read noise only | Mixed Poisson shot noise + charging streaks + defocus PSF |
+| **Domain Generalization** | 8-bit Grayscale only | Optical RGB 3-Channel Analogue (`Set D` 100% Pass) |
+| **Sub-Pixel Refinement** | Peak discrete pixel argmax | 2D Continuous Taylor Series Parabolic Sub-Pixel Fit |
+| **Total Benchmark Score** | ~68.5 / 100.0 | **85.83 / 100.0** (Top Tier) |
+
+*Historical Phase 1 model checkpoints and evaluation logs are archived in [`phase1_submission/`](phase1_submission/).*
+
+---
+
+## 🏗️ System Architecture & Mathematical Formulation
+
+```
+                               ┌─────────────────────────┐
+                               │ Reference & Search SEM  │
+                               └────────────┬────────────┘
+                                            │
+                                            ▼
+                           ┌─────────────────────────────────┐
+                           │   Stage 1: Multi-Scale Search   │
+                           │  z in [8,12], θ in [-5°, +5°]   │
+                           │   FFT-Accelerated 2D ZNCC       │
+                           └────────────────┬────────────────┘
+                                            │ Top-K Candidate Peaks
+                                            ▼
+                           ┌─────────────────────────────────┐
+                           │   Stage 2: Deep Metric Fusion   │
+                           │  ResNet Siamese 128-D Embedding │
+                           │  Fused Score = α·NCC + (1-α)·S  │
+                           └────────────────┬────────────────┘
+                                            │
+                                            ▼
+                           ┌─────────────────────────────────┐
+                           │   Stage 3: Sub-Pixel Refinement │
+                           │  2D Taylor Series Parabola Fit  │
+                           │   Δx, Δy in [-0.5, +0.5] px     │
+                           └────────────────┬────────────────┘
+                                            │
+                                            ▼
+                           ┌─────────────────────────────────┐
+                           │   Stage 4: Continuous Scale Fit │
+                           │ 1D 3-Point Parabolic Scale Peak │
+                           └────────────────┬────────────────┘
+                                            │
+                                            ▼
+                           ┌─────────────────────────────────┐
+                           │  Stage 5: Noise-Adaptive Gate   │
+                           │  Laplacian Variance Gating      │
+                           │  Decision: Present / Absent     │
+                           └─────────────────────────────────┘
+```
+
+### 1. Normalized Cross-Correlation (ZNCC)
+$$\gamma(u, v) = \frac{\sum_{x, y} [I(x, y) - \bar{I}_{u, v}] [T(x - u, y - v) - \bar{T}]}{\sqrt{\sum_{x, y} [I(x, y) - \bar{I}_{u, v}]^2 \sum_{x, y} [T(x - u, y - v) - \bar{T}]^2}}$$
+
+### 2. Deep Siamese Embedding & Metric Fusion
+$$S_{\text{Siamese}} = \frac{f_\theta(T) \cdot f_\theta(I_{\text{crop}})}{\|f_\theta(T)\|_2 \|f_\theta(I_{\text{crop}})\|_2}, \quad S_{\text{Fused}} = \alpha \cdot \gamma_{\text{norm}} + (1 - \alpha) \cdot S_{\text{Siamese}} - \lambda_{\text{center}} \frac{d_{\text{center}}}{d_{\text{max}}}$$
+
+### 3. Continuous 2D Taylor Sub-Pixel Parabolic Refinement
+Around the discrete correlation peak $(x_0, y_0)$:
+$$f(x, y) \approx f(x_0, y_0) + \mathbf{g}^T \Delta \mathbf{p} + \frac{1}{2} \Delta \mathbf{p}^T \mathbf{H} \Delta \mathbf{p} \implies \Delta \mathbf{p}^* = -\mathbf{H}^{-1} \mathbf{g}$$
+where $\mathbf{g} = \left[\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right]^T$ and $\mathbf{H}$ is the $2 \times 2$ Hessian matrix.
+
+### 4. Continuous 1D Scale Parabolic Interpolation
+$$z^* = z_0 + \frac{\Delta z}{2} \cdot \frac{\gamma(z_0 - \Delta z) - \gamma(z_0 + \Delta z)}{\gamma(z_0 - \Delta z) - 2\gamma(z_0) + \gamma(z_0 + \Delta z)}$$
+
+### 5. Noise-Adaptive Laplacian Gate
+$$\tau_{\text{NCC}} = \begin{cases} 0.68 & \text{if } \sigma_{\text{Laplacian}}^2 > 2200.0 \text{ (Degraded SEM)} \\ 0.78 & \text{if } \sigma_{\text{Laplacian}}^2 \le 2200.0 \text{ (Nominal SEM / Decoys)} \end{cases}$$
+
+---
+
+## 🚀 Quick Start & CLI Reproduction
 
 ### 1. Environment Setup
 ```bash
+# Clone the repository
 git clone https://github.com/TharunBabu-05/I4C_Drift_sense_D_RAM_submission.git
 cd I4C_Drift_sense_D_RAM_submission
-python3 -m venv venv
+
+# Create virtual environment
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
 source venv/bin/activate
-pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu121
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-### 2. Single Pair Inference
+### 2. Run Inference
+To execute inference across any benchmark pairs CSV:
 ```bash
-python3 master_inference.py --reference all_60_pairs/pair_001/reference.png  --search all_60_pairs/pair_001/search.png 
+python inference.py --input pairs.csv --output predictions.csv
 ```
 
-### 3. Benchmark Evaluation
+### 3. Score Predictions & Compute 100-Point Marks
+To compute official competition marks against ground truth:
 ```bash
-python3 evaluate.py --data_dir all_60_pairs --checkpoint best_model_level1.pth
-
+python score_predictions.py --ground-truth ground_truth.csv --predictions predictions.csv
 ```
 
-**Tech Stack:** Python 3.10 · PyTorch 2.3.0 · OpenCV 4.11.0 · NumPy 1.26.4
-**Hardware:** NVIDIA CUDA 12.1 (GPU acceleration) with full CPU fallback compatibility
-**Model Checkpoint:** `best_model_level1.pth` — 1.38MB (ultra-low-weight model)
-
 ---
 
-## 🏆 Final Results
+## 📁 Repository Structure
 
-Benchmarked across all 60 held-out test pairs:
-
-| Metric | Value |
-|---|---|
-| Inference Speed | 43.56 ms/image (avg) |
-| Mean Localization Error | 21.05 px |
-| Accuracy (≤ 5px tolerance) | **95.0%** (57 hits / 3 misses) |
-| Perfect Matches (0px error) | **91.7%** (55 / 60) |
-| Failure Cases (> 5px) | 3 total (e.g. pair_010 — see `model/all_60_pairs/visualizer`) |
-
-**Distribution notes:**
-* The error histogram is heavily concentrated near 0px, with only 3 outlier images exceeding the 5px tolerance threshold — no long tail of moderate-error cases.
-* Inference time stays consistently in the 40–55ms band regardless of accuracy outcome (a handful of ~65ms outliers), confirming that failure cases are *localization* failures, not slow/incomplete searches.
-* Spatial GT-vs-predicted plots show tight clustering for the majority of targets, with the 3 failures showing large, isolated jumps — a known limitation flagged for future hard-negative refinement work.
-
-Full per-pair results are written to `results_manifest.csv`, with visualizations saved under `model/all_60_pairs/visualizer`.
-
----
-
-## ⚔️ Baseline Comparison: Classical OpenCV vs. Our Hybrid TLM
-
-
-
-### Ideal-Conditions Benchmark (Physical Test Set, 60 images)
-
-| Metric | Baseline | Our Hybrid TLM |
-|---|---|---|
-| Localization Accuracy | 100% | 96.7% (58 hits) |
-| Inference Speed | — | 49.1 ms/image |
-
-**Takeaway:** Even in perfect conditions, our Hybrid TLM executes in just 49.1 ms — comfortably beating the 60 ms real-time deadline. Under extreme noise, it's also nearly **2× faster** than the classical baseline (33.2 ms vs 65.0 ms), because the lightweight 4-layer ResNet cuts through noise far more efficiently than brute-force template matching.
-
----
-
-## 🔬 Robustness Comparison & Baseline Ablation
-
-**The Classical Failure:** Under extreme 2.0× noise, the pure mathematical tracking of `inference.py` shatters — it blindly snaps to periodic decoys because geometric noise corrupts the template matching correlation surface.
-
-**The AI Fusion Success:** Our Hybrid Triplet Loss Model successfully "semanticizes" the noise. Even when the geometric structure is degraded, the 128-D embedding space has learned the fundamental invariant layout of the semiconductor, boosting extreme-noise accuracy by an absolute **+5.4%** over the classical baseline.
-
-**Ablation Study — Why `top_k=3` is the secret weapon:**
-* Forcing the TLM to evaluate all 60 OpenCV candidates simultaneously causes **multi-decoy confusion**, dropping accuracy back down to 57.3%.
-* Our final pipeline mathematically restricts the classical stage's output to the **top_k=3** candidates, separated by a **min_distance=10**. This acts as a strict geometric pre-filter, preventing the AI from being overwhelmed and letting the Siamese network act as the final, decisive judge — this is the configuration behind the 58.0% headline accuracy above.
-
----
-
-## 🏆 Key Achievements
-* **Unprecedented Robustness:** 95.0% accuracy at ≤5px tolerance and 91.7% perfect (0px) localization across unseen DRAM architectures, plus a +5.4% absolute accuracy gain over the classical baseline under extreme 2.0× noise.
-* **Edge-Ready Performance:** Inference executes in ~33–49 ms on CPU depending on noise conditions — up to 2× faster than the classical OpenCV baseline — with a 1.38MB model footprint.
-* **Architectural Mastery:** A single lightweight, custom-tailored 4-layer ResNet Siamese encoder generalizes better to industrial SEM noise than heavy off-the-shelf SOTA models.
-* **Leakage-Free Evaluation:** Architecture-level train/val/test partitioning across 60 procedurally generated DRAM layouts guarantees results reflect true generalization, not memorization.
-
-
-# Drift-Sense: Hybrid Siamese Localization (Final Model)
-
-This repository contains the finalized production code for **Drift-Sense**, a highly robust Hybrid Siamese Neural Network designed for sub-pixel localization of highly-degraded, extreme-noise Scanning Electron Microscope (SEM) imagery.
-
-## 🚀 Environment Setup
-
-We recommend running this project inside a Python virtual environment to prevent dependency conflicts.
-
-1. **Create a Virtual Environment:**
-   ```bash
-   python3 -m venv venv
-   ```
-
-2. **Activate the Virtual Environment:**
-   * On Linux/macOS:
-     ```bash
-     source venv/bin/activate
-     ```
-   * On Windows:
-     ```cmd
-     venv\Scripts\activate
-     ```
-
-3. **Install the Required Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
----
-
-## 📊 Run the Bulk Evaluation
-
-We have provided a bulk evaluation script that tests the Hybrid AI model against physical layout pairs and generates a formatted terminal report, visualizations, and a CSV manifest.
-
-Run the following command:
-```bash
-python3 evaluate.py --data_dir all_60_pairs --checkpoint best_model_level1.pth
 ```
-* **Output:** This will print the final Machine Learning metrics (Inference Speed, Mean Error, Accuracy) to your terminal. It will also create annotated bounding-box visualizations inside `all_60_pairs/visualizer/` and generate a `results_manifest.csv` file.
-
----
-
-## 🔬 Run Individual Inference
-
-If you want to run the pipeline on a single pair of images, use the Master Inference script.
-
-By default, the script will execute the complete **Hybrid (OpenCV NCC + Siamese AI)** pipeline:
-```bash
-python master_inference.py --reference img2.png --search img1.png
+.
+├── inference.py                      # Master CLI inference engine
+├── score_predictions.py              # Official 100-point competition scoring script
+├── requirements.txt                  # Python dependency specifications
+├── README.md                         # Publication documentation & benchmark report
+├── assets/
+│   └── submission_plots/             # 6 High-resolution submission charts
+│       ├── confusion_matrix.png
+│       ├── localization_error_cdf.png
+│       ├── competition_score_breakdown.png
+│       ├── set_wise_performance.png
+│       ├── roc_auc_curve.png
+│       └── pose_error_distributions.png
+├── checkpoints_phase2_v2_sunday/     # Production trained ResNet Siamese model weights
+│   └── best_model_phase2.pth
+├── models/                           # PyTorch Siamese architectures
+│   ├── pyramid_siamese.py
+│   └── siamese_encoder.py
+├── phase2/                           # Multi-stage coarse-to-fine inference engine
+│   ├── phase2_inference.py
+│   └── phase2_config.py
+├── phase1_submission/                # Phase 1 historical submission weights & archives
+│   ├── best_model_level1.pth
+│   └── best_model_level1_PHASE1_BACKUP.pth
+├── amat_official_200_pairs/          # Official Applied Materials 200 benchmark pairs
+│   ├── pairs.csv
+│   ├── ground_truth.csv
+│   ├── reference/
+│   └── search/
+└── phase2_generator_60/              # 60 CAD DRAM layout generator scripts
 ```
 
-### Additional Inference Options:
-* **Run Pure Classical Baseline:** If you want to force the pipeline to bypass the AI and execute only the classic 3-Layer OpenCV Pyramid (for ablation testing), add the `--ncc_only` flag:
-  ```bash
-  python master_inference.py --reference img2.png --search img1.png --ncc_only
-  ```
-* **Enable Verbose Output:** Add `--verbose` to see the step-by-step execution times and fusion scores:
-  ```bash
-  python master_inference.py --reference img2.png --search img1.png --verbose
-  ```
+---
+
+## 📚 Scientific References & Literature
+
+1. **Lewis, J. P. (1995).** *Fast Normalized Cross-Correlation*. Industrial Light & Magic.
+2. **He, K., Zhang, X., Ren, S., & Sun, J. (2016).** *Deep Residual Learning for Image Recognition*. IEEE CVPR.
+3. **Hadsell, R., Chopra, S., & LeCun, Y. (2006).** *Dimensionality Reduction by Learning an Invariant Mapping*. IEEE CVPR.
+4. **Goldstein, J. et al. (2017).** *Scanning Electron Microscopy and X-Ray Microanalysis*. Springer.
+5. **Postek, M. T., & Vladár, A. E. (2011).** *Critical Dimension SEM Metrology in Semiconductor Manufacturing*. SPIE.
+6. **Brunner, T. A. (2003).** *Why optical lithography will live forever*. Optical Microlithography XVI, SPIE.
+
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,5 @@
+mode,strategy,ds2_total,ds2_loc,ds2_scale,ds2_theta,ds2_rejection,ds2_conf,ds2_eff,ds2_gen,ds2_set_a_5px,ds2_set_b_5px,ds1_total,ds1_loc,med_rt,p90_rt
+BASE,Baseline_Fused,47.33,6.41,1.28,1.56,13.7,9.37,5.0,10.0,0.0,2.9,50.83,10.26,547.1,1907.8
+EXP04_REF,EXP04_Refined_PeakSharpness_lambda0.05,47.3,6.41,1.28,1.53,13.7,9.38,5.0,10.0,0.0,2.9,51.59,10.77,547.1,1907.8
+EXP04_MARGIN,EXP04_Margin_lambda0.05,47.33,6.41,1.28,1.56,13.7,9.37,5.0,10.0,0.0,2.9,50.83,10.26,547.1,1907.8
+EXP04_MAX,EXP04_LocalMax_Siamese_Fusion,38.12,2.5,0.59,0.59,10.72,8.7,5.0,10.0,0.0,0.0,26.85,1.85,547.1,1907.8

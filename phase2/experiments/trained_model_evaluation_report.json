@@ -1,0 +1,95 @@
+{
+  "checkpoint": "phase2_checkpoints/best_model_level1.pth",
+  "ds2_60gen_metrics": {
+    "stats_a": {
+      "mean_err": 153.06645434992112,
+      "median_err": 1.7985215474513547,
+      "pct_1px": 24.285714285714285,
+      "pct_2px": 61.42857142857143,
+      "pct_3px": 61.42857142857143,
+      "pct_5px": 61.42857142857143,
+      "mean_credit": 0.5399999999999999
+    },
+    "stats_b": {
+      "mean_err": 100.09289404388194,
+      "median_err": 15.5880590476384,
+      "pct_1px": 2.857142857142857,
+      "pct_2px": 10.0,
+      "pct_3px": 15.714285714285714,
+      "pct_5px": 37.142857142857146,
+      "mean_credit": 0.2057142857142857
+    },
+    "stats_d": {
+      "mean_err": 132.0079011345544,
+      "median_err": 83.27746170121351,
+      "pct_1px": 15.0,
+      "pct_2px": 50.0,
+      "pct_3px": 50.0,
+      "pct_5px": 50.0,
+      "mean_credit": 0.43
+    },
+    "loc_score": 14.245714285714284,
+    "scale_score": 4.28125,
+    "theta_score": 5.75,
+    "rejection_score": 13.445378151260504,
+    "confidence_score": 9.8171875,
+    "eff_score": 5.0,
+    "total_score": 52.53952993697479,
+    "tp": 160,
+    "tn": 3,
+    "fp": 37,
+    "fn": 0,
+    "precision": 0.8121827411167513,
+    "recall": 1.0,
+    "f1_score": 0.896358543417367,
+    "auc": 0.98171875,
+    "median_runtime_ms": 388.96429538726807,
+    "mean_runtime_ms": 387.1031987667084
+  },
+  "ds1_generic_metrics": {
+    "stats_a": {
+      "mean_err": 2.524606651652449,
+      "median_err": 1.1160206481483637,
+      "pct_1px": 40.0,
+      "pct_2px": 92.85714285714286,
+      "pct_3px": 95.71428571428572,
+      "pct_5px": 95.71428571428572,
+      "mean_credit": 0.8399999999999997
+    },
+    "stats_b": {
+      "mean_err": 48.190327000885226,
+      "median_err": 21.28979098065545,
+      "pct_1px": 5.714285714285714,
+      "pct_2px": 18.571428571428573,
+      "pct_3px": 20.0,
+      "pct_5px": 21.428571428571427,
+      "mean_credit": 0.1742857142857143
+    },
+    "stats_d": {
+      "mean_err": 1.2322385753667484,
+      "median_err": 1.164335830908213,
+      "pct_1px": 30.0,
+      "pct_2px": 95.0,
+      "pct_3px": 100.0,
+      "pct_5px": 100.0,
+      "mean_credit": 0.8500000000000002
+    },
+    "loc_score": 18.95428571428571,
+    "scale_score": 6.788079470198676,
+    "theta_score": 8.609271523178808,
+    "rejection_score": 13.727272727272727,
+    "confidence_score": 9.06640625,
+    "eff_score": 5.0,
+    "total_score": 62.145315684935916,
+    "tp": 151,
+    "tn": 21,
+    "fp": 19,
+    "fn": 9,
+    "precision": 0.888235294117647,
+    "recall": 0.94375,
+    "f1_score": 0.9151515151515152,
+    "auc": 0.906640625,
+    "median_runtime_ms": 377.9062032699585,
+    "mean_runtime_ms": 377.01109647750854
+  }
+}

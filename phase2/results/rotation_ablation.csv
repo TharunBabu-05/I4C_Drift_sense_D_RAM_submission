@@ -1,0 +1,5 @@
+configuration,pct_5px,mean_loc_err_px,mean_theta_err_deg,median_runtime_ms
+1. Fixed 0°,28.0,254.83,2.79,968.7
+2. Coarse Grid 2.5°,28.0,185.25,2.54,907.9
+3. 1.0° Grid,28.0,254.83,2.43,904.1
+4. 0.5° Grid,28.0,251.27,2.47,556.9

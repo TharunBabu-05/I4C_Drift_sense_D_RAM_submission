@@ -1,0 +1,5 @@
+model,dataset,loc_score,scale_score,rotation_score,rejection_score,confidence_score,efficiency_score,total_score,set_a_5px,set_b_5px,median_rt_ms
+Original_Phase1_best_model_level1,DS2_60Gen,14.25,4.28,5.75,13.45,9.82,5.0,52.54,61.4,37.1,346.9
+Hard_Negative_best_model_hard_negative,DS2_60Gen,12.99,4.12,5.16,13.55,9.72,5.0,50.54,52.9,35.7,350.2
+Original_Phase1_best_model_level1,DS1_Generic,18.95,6.79,8.61,13.73,9.07,5.0,62.15,95.7,21.4,349.4
+Hard_Negative_best_model_hard_negative,DS1_Generic,19.42,7.17,8.8,14.52,9.95,5.0,64.85,98.6,21.4,349.8
