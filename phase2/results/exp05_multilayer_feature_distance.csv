@@ -1,6 +1,0 @@
-exp_id,layer_key,lambda,strategy,ds2_total,ds2_loc,ds2_scale,ds2_theta,ds2_rejection,ds2_conf,ds2_eff,ds2_gen,ds2_set_a_5px,ds2_set_b_5px,top5_recall_pct,gt_selected_count,med_rt,p90_rt,p99_rt
-BASE,d_emb,0.0,Baseline_Fused,47.33,6.41,1.28,1.56,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,511.7,574.6,611.7
-EXP05A,d_layer1,0.1,Layer1_Feature_Distance,47.37,6.41,1.25,1.53,13.81,9.36,5.0,10.0,0.0,2.9,36.2,45,511.7,574.6,611.7
-EXP05B,d_layer2,0.1,Layer2_Feature_Distance,47.37,6.41,1.25,1.53,13.81,9.36,5.0,10.0,0.0,2.9,36.2,45,511.7,574.6,611.7
-EXP05C,d_layer3,0.1,Layer3_Feature_Distance,47.36,6.41,1.25,1.53,13.81,9.36,5.0,10.0,0.0,2.9,36.2,45,511.7,574.6,611.7
-EXP05D,d_emb,0.1,Final_128D_Embedding_Distance,47.36,6.41,1.25,1.53,13.81,9.36,5.0,10.0,0.0,2.9,36.2,45,511.7,574.6,611.7

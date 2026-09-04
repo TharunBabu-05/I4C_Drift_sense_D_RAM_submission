@@ -1,9 +1,0 @@
-category,max_points,ds2_60gen_score,ds2_points_lost,ds1_generic_score,ds1_points_lost,primary_bottleneck
-Localization (40),40.0,5.85,34.15,9.29,30.71,Periodic cell replica selection
-Pose Scale (10),10.0,1.28,8.72,2.66,7.34,Localization failure cascades to pose
-Pose Rotation (10),10.0,1.56,8.44,2.59,7.41,Localization failure cascades to pose
-Rejection (15),15.0,13.7,1.3,13.11,1.89,Rejection threshold & FN/FP
-Confidence Calibration (10),10.0,9.38,0.62,7.28,2.72,Score ranking overlap
-CPU Efficiency (5),5.0,5.0,0.0,5.0,0.0,None (Fast runtime ~350ms)
-Generator / Citations (10),10.0,10.0,0.0,10.0,0.0,Carried forward from Phase 1
-TOTAL SCORE (100),100.0,46.77,53.23,49.92,50.08,Candidate Selection of Periodic Replicas

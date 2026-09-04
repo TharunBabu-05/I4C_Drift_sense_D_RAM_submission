@@ -1,6 +1,0 @@
-exp_id,feature_key,lambda,strategy,ds2_total,ds2_loc,ds2_scale,ds2_theta,ds2_rejection,ds2_conf,ds2_eff,ds2_gen,ds2_set_a_5px,ds2_set_b_5px,top5_recall_pct,gt_selected_count,med_rt,p90_rt,p99_rt
-BASE,d_base,0.0,Baseline_Fused,47.33,6.41,1.28,1.56,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,533.5,599.9,641.5
-EXP06B,supp_count,0.05,NCC_plus_SupportCount_lambda0.05,50.93,9.15,2.06,1.72,13.48,9.52,5.0,10.0,0.0,4.3,36.2,55,533.5,599.9,641.5
-EXP06C,mean_supp_ncc,0.05,NCC_plus_MeanSupportNCC_lambda0.05,48.41,7.11,1.44,1.66,13.75,9.45,5.0,10.0,0.0,2.9,36.2,48,533.5,599.9,641.5
-EXP06D,supp_ratio,0.05,NCC_plus_SupportRatio_lambda0.05,47.64,6.6,1.28,1.62,13.75,9.39,5.0,10.0,0.0,2.9,36.2,44,533.5,599.9,641.5
-EXP06E,weighted_supp,0.05,NCC_plus_WeightedTransformStability_lambda0.05,51.2,8.99,2.03,1.66,13.79,9.72,5.0,10.0,1.4,4.3,36.2,54,533.5,599.9,641.5

@@ -1,6 +1,0 @@
-exp_id,feature_key,w_verif,strategy,ds2_total,ds2_loc,ds2_scale,ds2_theta,ds2_rejection,ds2_conf,ds2_eff,ds2_gen,ds2_set_a_5px,ds2_set_b_5px,top5_recall_pct,gt_selected_count,med_rt,p90_rt,p99_rt
-BASE,fused_orig,0.0,Baseline_Fused,47.33,6.41,1.28,1.56,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,516.4,571.9,617.4
-EXP06_CANONICAL_NCC,canonical_ncc,1.0,Canonical_Local_NCC_Only,51.64,8.05,1.94,2.09,14.67,9.9,5.0,10.0,1.4,4.3,36.2,52,516.4,571.9,617.4
-EXP06_W10,canonical_ncc,0.1,Fused_80_Canonical_10,47.36,6.41,1.28,1.59,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,516.4,571.9,617.4
-EXP06_W20,canonical_ncc,0.2,Fused_80_Canonical_20,47.36,6.41,1.28,1.59,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,516.4,571.9,617.4
-EXP06_W30,canonical_ncc,0.3,Fused_70_Canonical_30,47.36,6.41,1.28,1.59,13.7,9.37,5.0,10.0,0.0,2.9,36.2,45,516.4,571.9,617.4

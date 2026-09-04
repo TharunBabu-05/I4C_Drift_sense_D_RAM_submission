@@ -1,0 +1,71 @@
+===================================================================================
+STANDALONE SEM SYNTHETIC DATASET GENERATOR - INSTRUCTION MANUAL
+===================================================================================
+
+This package contains the complete standalone synthetic SEM image pair generator
+suite for semiconductor target pattern localization.
+
+-----------------------------------------------------------------------------------
+1. PREREQUISITES & INSTALLATION
+-----------------------------------------------------------------------------------
+Ensure Python 3.8+ is installed on your system. Open your terminal / PowerShell
+and install the required Python packages:
+
+    pip install numpy opencv-python Pillow
+
+
+-----------------------------------------------------------------------------------
+2. PACKAGE CONTENTS & FILE STRUCTURE
+-----------------------------------------------------------------------------------
+standalone_dataset_generator/
+│
+├── clean_60_scripts/           # All 60 semiconductor architecture CAD generator scripts
+├── degradation_engine.py       # SEM degradation models
+├── noise_engine.py             # Underlying stochastic noise primitives
+├── master_generator_v2.py      # Core pattern generation & ground truth mapper
+├── generate_dataset.py         # Main CLI tool with hidden test script isolation
+└── INSTRUCTIONS.txt            # This instruction manual
+
+
+-----------------------------------------------------------------------------------
+3. KEY DATASET FEATURES & GUARANTEES
+-----------------------------------------------------------------------------------
+- 2.0x NOISE IMPACT: Increased noise intensity by 2.0x for realistic SEM challenge.
+- SINGLE NOISE CATEGORY: Exactly 1 noise model per search image (Poisson, Gaussian, Blur, Speckle, etc.).
+- NO TEXT / ANNOTATION BANNERS: 100% stripped of text overlays. Pure SEM images only!
+- FULL CANVAS TARGET SPREAD: Targets distributed across [100, 900] canvas with ZERO center bias.
+- EQUAL SCRIPT RATIO: Every script (001 to 060) executes in equal ratio.
+- STRICT TEST ISOLATION:
+    50 Architecture Generators ---> Saved to `train/` (80% of pairs)
+    5 Architecture Generators  ---> Saved to `val/`   (10% of pairs)
+    5 Architecture Generators  ---> Saved to `test/`  (10% HIDDEN TEST SET)
+
+
+-----------------------------------------------------------------------------------
+4. HOW TO GENERATE A 15,000 DATASET PAIRS (OR ANY CUSTOM SIZE)
+-----------------------------------------------------------------------------------
+
+A. To Generate 15,000 Image Pairs (Recommended 15K Dataset):
+-------------------------------------------------------------
+Open your terminal in the `standalone_dataset_generator` directory and run:
+
+    python generate_dataset.py --num_pairs 15000 --output_dir ./my_dataset_15k
+
+
+B. To Generate 10,000 Image Pairs:
+----------------------------------
+    python generate_dataset.py --num_pairs 10000 --output_dir ./my_dataset_10k
+
+
+C. To Generate 2,500 Image Pairs (Fast Prototype):
+--------------------------------------------------
+    python generate_dataset.py --num_pairs 2500 --output_dir ./my_dataset_2k5
+
+
+-----------------------------------------------------------------------------------
+5. AUTOMATIC MEMORY SAFETY & RESUMABLE GENERATION
+-----------------------------------------------------------------------------------
+- Automatic Memory Cleanup: Releases array buffers automatically during long runs.
+- Instant Resumable Generation: If generation is paused or interrupted, re-running 
+  the exact command skips already-generated pairs instantly.
+===================================================================================
