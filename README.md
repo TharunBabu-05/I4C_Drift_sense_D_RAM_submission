@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="phase1_submission/assets/drift_sense_animated.svg" width="100%">
+<img src="assets/drift_sense_animated.svg" width="100%">
 
 </div>
 
